@@ -1,11 +1,12 @@
 import math
+import os
 import threading
 import time
 
 import flet as ft
 import requests
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = "https://p2p-ati8.onrender.com"
 CUSTOMER_PHONE = "0901234567"
 HELPER_NAME = "ĐỖ KHÁNH HÙNG"
 TIMEOUT = 5
@@ -863,7 +864,7 @@ def main(page: ft.Page):
         switch_tab("DI_CUU_HO")
 
     slider_state = {"x": 0.0}
-    slider_width = 370
+    slider_width = 330
 
     def on_pan_update(e: ft.DragUpdateEvent):
         new_x = slider_state["x"] + e.delta_x
@@ -1178,7 +1179,19 @@ def main(page: ft.Page):
         ref=bottom_container, bgcolor=ft.colors.WHITE, padding=15, alignment=ft.alignment.center, content=slider_track, visible=False
     )
 
-    page.add(ft.Column([header, tabs_bar, content_area_container, bottom_slider_container], spacing=0, expand=True))
+    shell = ft.Container(
+        content=ft.Column([header, tabs_bar, content_area_container, bottom_slider_container], spacing=0, expand=True),
+        width=min(page.width or 420, 420),
+        bgcolor="#F8F9FA",
+    )
+
+    def on_page_resize(e):
+        shell.width = min(page.width or 420, 420)
+        page.update()
+
+    page.on_resize = on_page_resize
+    page.bgcolor = "#DEE2E6"
+    page.add(ft.Row([shell], alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.STRETCH, expand=True))
     switch_tab("GOI_CUU_HO")
     threading.Thread(target=auto_refresh, daemon=True).start()
     setup_geolocator()
@@ -1186,4 +1199,8 @@ def main(page: ft.Page):
     threading.Thread(target=location_loop, daemon=True).start()
 
 
-ft.app(target=main)
+port = os.environ.get("PORT")
+if port:
+    ft.app(target=main, view=None, host="0.0.0.0", port=int(port))
+else:
+    ft.app(target=main)
