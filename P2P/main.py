@@ -864,7 +864,7 @@ def main(page: ft.Page):
         switch_tab("DI_CUU_HO")
 
     slider_state = {"x": 0.0}
-    slider_width = 370
+    slider_width = 330
 
     def on_pan_update(e: ft.DragUpdateEvent):
         new_x = slider_state["x"] + e.delta_x
@@ -1179,7 +1179,19 @@ def main(page: ft.Page):
         ref=bottom_container, bgcolor=ft.colors.WHITE, padding=15, alignment=ft.alignment.center, content=slider_track, visible=False
     )
 
-    page.add(ft.Column([header, tabs_bar, content_area_container, bottom_slider_container], spacing=0, expand=True))
+    shell = ft.Container(
+        content=ft.Column([header, tabs_bar, content_area_container, bottom_slider_container], spacing=0, expand=True),
+        width=min(page.width or 420, 420),
+        bgcolor="#F8F9FA",
+    )
+
+    def on_page_resize(e):
+        shell.width = min(page.width or 420, 420)
+        page.update()
+
+    page.on_resize = on_page_resize
+    page.bgcolor = "#DEE2E6"
+    page.add(ft.Row([shell], alignment=ft.MainAxisAlignment.CENTER, vertical_alignment=ft.CrossAxisAlignment.STRETCH, expand=True))
     switch_tab("GOI_CUU_HO")
     threading.Thread(target=auto_refresh, daemon=True).start()
     setup_geolocator()
