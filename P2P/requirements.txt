@@ -1,4 +1,2 @@
-fastapi
-uvicorn
-pydantic
+flet==0.24.1
 requests
